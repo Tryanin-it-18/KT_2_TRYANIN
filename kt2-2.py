@@ -1,16 +1,12 @@
+#Посмотрите пожалуйста, я нашёл ошибку. 
 import heapq
 
-
 class Graph:
-
     def __init__(self, matrix):
-
         self.matrix = matrix
         self.n = len(matrix)
 
-    def decst(self, start, end):
-
-        # массив расстояний от start до каждой вершины
+    def dijkstra(self, start, end):  # Исправлено имя метода с decst на dijkstra
         dist = [float('inf')] * self.n
         dist[start] = 0
 
@@ -20,21 +16,19 @@ class Graph:
             # извлекаем вершину с минимальным расстоянием
             cur_dist, cur = heapq.heappop(queue)
 
-            # если дошли до конечной вершины
             if cur == end:
                 return cur_dist
 
-            # пропускаем устаревшие расстояния
             if cur_dist > dist[cur]:
                 continue
 
             # проверяем всех соседей текущей вершины
             for neighbor in range(self.n):
                 weight = self.matrix[cur][neighbor]
-                # если есть ребро
+
                 if weight != 0:
                     new_dist = cur_dist + weight
-                    # если нашли более короткий путь
+
                     if new_dist < dist[neighbor]:
                         dist[neighbor] = new_dist
                         heapq.heappush(queue, (new_dist, neighbor))
@@ -43,11 +37,9 @@ class Graph:
         return -1
 
     def get_vertex_count(self):
-
         return self.n
 
     def get_edges(self, vertex):
-
         edges = []
         for neighbor in range(self.n):
             weight = self.matrix[vertex][neighbor]
@@ -55,15 +47,11 @@ class Graph:
                 edges.append((neighbor, weight))
         return edges
 
-
 class GraphP:
-
-
     def __init__(self):
         self.graph = None
 
     def read_input(self):
-
         start = int(input("K: ")) - 1  # начальная вершина
         end = int(input("M: ")) - 1  # конечная вершина
         n = int(input("N: "))  # количество вершин
@@ -84,7 +72,7 @@ class GraphP:
         if self.graph is None:
             raise ValueError("Граф не инициализирован")
 
-        return self.graph.dijkstra(start, end)
+        return self.graph.dijkstra(start, end)  # Исправлено имя метода
 
     def display_result(self, start, end, result):
         """Вывод результата"""
@@ -92,7 +80,6 @@ class GraphP:
             print(f"Пути из вершины {start + 1} в вершину {end + 1} не существует")
         else:
             print(f"Длина кратчайшего пути из {start + 1} в {end + 1}: {result}")
-
 
 def main():
     """Основная функция программы"""
@@ -113,7 +100,6 @@ def main():
         print(f"Ошибка ввода данных: {e}")
     except Exception as e:
         print(f"Произошла ошибка: {e}")
-
 
 if __name__ == "__main__":
     main()
