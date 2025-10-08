@@ -1,56 +1,118 @@
 import heapq
 
 
-def dijkstra(g, start, end):
-    n = len(g)
-    dist = [float('inf')] * n  # расстояния до вершин
-    dist[start] = 0  # до старта 0
+class Graph:
 
-    # очередь: (расстояние, вершина)
-    queue = [(0, start)]
+    def __init__(self, matrix):
 
-    while queue:
-        cur_dist, cur = heapq.heappop(queue)
+        self.matrix = matrix
+        self.n = len(matrix)
 
-        # если дошли до конца
-        if cur == end:
-            return cur_dist
+    def decst(self, start, end):
 
-        # если расстояние устарело
-        if cur_dist > dist[cur]:
-            continue
+        # массив расстояний от start до каждой вершины
+        dist = [float('inf')] * self.n
+        dist[start] = 0
 
-        # смотрим соседей
+        queue = [(0, start)]
+
+        while queue:
+            # извлекаем вершину с минимальным расстоянием
+            cur_dist, cur = heapq.heappop(queue)
+
+            # если дошли до конечной вершины
+            if cur == end:
+                return cur_dist
+
+            # пропускаем устаревшие расстояния
+            if cur_dist > dist[cur]:
+                continue
+
+            # проверяем всех соседей текущей вершины
+            for neighbor in range(self.n):
+                weight = self.matrix[cur][neighbor]
+                # если есть ребро
+                if weight != 0:
+                    new_dist = cur_dist + weight
+                    # если нашли более короткий путь
+                    if new_dist < dist[neighbor]:
+                        dist[neighbor] = new_dist
+                        heapq.heappush(queue, (new_dist, neighbor))
+
+        # если путь не найден
+        return -1
+
+    def get_vertex_count(self):
+
+        return self.n
+
+    def get_edges(self, vertex):
+
+        edges = []
+        for neighbor in range(self.n):
+            weight = self.matrix[vertex][neighbor]
+            if weight != 0:
+                edges.append((neighbor, weight))
+        return edges
+
+
+class GraphP:
+
+
+    def __init__(self):
+        self.graph = None
+
+    def read_input(self):
+
+        start = int(input("K: ")) - 1  # начальная вершина
+        end = int(input("M: ")) - 1  # конечная вершина
+        n = int(input("N: "))  # количество вершин
+
+        # чтение матрицы смежности
+        matrix = []
+        print(f"Введите матрицу смежности {n}x{n}:")
         for i in range(n):
-            w = g[cur][i]  # вес ребра
-            if w != 0:  # если есть ребро
-                new_dist = cur_dist + w
+            row = list(map(int, input().split()))
+            matrix.append(row)
 
-                # если нашли короче
-                if new_dist < dist[i]:
-                    dist[i] = new_dist
-                    heapq.heappush(queue, (new_dist, i))
+        # создаем объект графа
+        self.graph = Graph(matrix)
+        return start, end
 
-    return dist[end] if dist[end] != float('inf') else -1
+    def find_shortest_path(self, start, end):
+        """Поиск кратчайшего пути между вершинами"""
+        if self.graph is None:
+            raise ValueError("Граф не инициализирован")
+
+        return self.graph.dijkstra(start, end)
+
+    def display_result(self, start, end, result):
+        """Вывод результата"""
+        if result == -1:
+            print(f"Пути из вершины {start + 1} в вершину {end + 1} не существует")
+        else:
+            print(f"Длина кратчайшего пути из {start + 1} в {end + 1}: {result}")
 
 
 def main():
-    # ввод данных
-    start = int(input("K: ")) - 1  # начало
-    end = int(input("M: ")) - 1    # конец
-    n = int(input("N: "))          # вершин
+    """Основная функция программы"""
+    try:
+        # создаем обработчик графа
+        processor = GraphP()
 
-    # читаем матрицу
-    g = []
-    for i in range(n):
-        row = list(map(int, input().split()))
-        g.append(row)
+        # читаем входные данные
+        start, end = processor.read_input()
 
-    # ищем путь
-    result = dijkstra(g, start, end)
+        # ищем кратчайший путь
+        result = processor.find_shortest_path(start, end)
 
-    # выводим результат
-    print(result)
+        # выводим результат
+        processor.display_result(start, end, result)
+
+    except ValueError as e:
+        print(f"Ошибка ввода данных: {e}")
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
 
 
 if __name__ == "__main__":
